@@ -4,8 +4,6 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -17,28 +15,29 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class Otp {
+
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
 	
 	@Column(nullable=false)
-	private String name;
+	private String otp;
 	
-	@Column(unique=true)
+	@Column(nullable=false)
 	private String email;
 	
 	@Column(nullable=false)
-	private String password;
+	private LocalDateTime expiredAt;
+	
+	@Column(nullable = false)
+    private LocalDateTime lastSentAt;
 	
 	@Column(nullable=false)
-	@Enumerated(EnumType.STRING)
-	private Role role;
+	private int attempts=0;
 	
 	@Column(nullable=false)
-	private boolean isVerified;
-	
-	
-	private LocalDateTime createdAt;
-	private LocalDateTime updatedAt;
+	private OtpType otpType=OtpType.REGISTRATION;
+	boolean verifiedForPasswordReset = false;
+
 }

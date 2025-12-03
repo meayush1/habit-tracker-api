@@ -13,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.ayush.habittracker.auth.service.AuthenticationService;
 import com.ayush.habittracker.dto.request.UserRequest;
 import com.ayush.habittracker.dto.response.UserResponse;
 import com.ayush.habittracker.exception.EmailAlreadyExistsException;
@@ -21,6 +22,7 @@ import com.ayush.habittracker.model.Habit;
 import com.ayush.habittracker.model.Role;
 import com.ayush.habittracker.model.User;
 import com.ayush.habittracker.repository.HabitRepository;
+import com.ayush.habittracker.repository.OtpRepository;
 import com.ayush.habittracker.repository.UserRepository;
 import com.ayush.habittracker.security.util.AuthUtil;
 
@@ -41,32 +43,15 @@ public class UserService {
 
 	@Autowired
 	AuthUtil authUtil;
+	
+	@Autowired
+	OtpRepository otpRepo;
+	
+	@Autowired
+	AuthenticationService authService;
 
-	// create user
-	public UserResponse createUser(UserRequest userReq) {
-		// check if the email is already exists or not
-		if (repo.existsByEmail(userReq.getEmail())) {
-			throw new EmailAlreadyExistsException("Email already registered: " + userReq.getEmail());
-		}
-
-		// change userRequest->user
-		User user = mapper.map(userReq, User.class);
-
-		// set time stamp and save user in DB
-		user.setCreatedAt(LocalDateTime.now(ZoneId.of("UTC")));
-		user.setUpdatedAt(LocalDateTime.now(ZoneId.of("UTC")));
-		user.setPassword(passwordEncoder.encode(user.getPassword()));
-		user.setRole(Role.USER);
-//		user.setRole(Role.ADMIN);
-		User savedUser = repo.save(user);
-
-		// again change user -> userResponse
-		UserResponse userRes = mapper.map(savedUser, UserResponse.class);
-		// return userReponse
-		return userRes;
-
-	}
-
+	
+	
 	// fetch one user by email
 	public UserResponse getUserByEmail(String email) {
 		// find user from DB

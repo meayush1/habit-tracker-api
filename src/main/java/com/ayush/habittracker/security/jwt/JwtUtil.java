@@ -24,8 +24,11 @@ public class JwtUtil {
     private long expirationMs;
 
     private Key getSigningKey() {
+        System.out.println("SECRET LENGTH: " + secretKey.length());
+        System.out.println("SECRET VALUE: '" + secretKey + "'");
         return Keys.hmacShaKeyFor(secretKey.getBytes());
     }
+
 
     // Generate JWT Token
     public String generateToken(User user) {
