@@ -47,6 +47,18 @@ public class HabitController {
         return ResponseUtil.success(res, "Habit fetched", HttpStatus.OK, Map.of("id", id));
     }
 
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<ApiResponse<Page<HabitResponse>>> getHabitsByUser(
+            @PathVariable Long userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction
+    ) {
+        var pageRes = habitService.getAllHabitsByUser(page, size, sortBy, direction, userId);
+        return ResponseUtil.success(pageRes, "Habits fetched", HttpStatus.OK,
+                Map.of("page", page, "size", size, "sortBy", sortBy, "direction", direction, "userId", userId));
+    }
     // Get all habits with pagination & sorting
     @GetMapping("/all")
     public ResponseEntity<ApiResponse<Page<HabitResponse>>> getAll(

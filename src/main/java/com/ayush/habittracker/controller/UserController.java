@@ -32,11 +32,13 @@ public class UserController {
 	@Autowired
 	private UserService service;
 
+	/*
 	@PostMapping
 	public ResponseEntity<ApiResponse<UserResponse>> create(@Valid @RequestBody UserRequest req) {
 		return ResponseUtil.success(service.createUser(req), "User created successfully", HttpStatus.CREATED,
 				Map.of("endpoint", "/users"));
 	}
+	*/
 
 	@GetMapping("/{id}")
 	public ResponseEntity<ApiResponse<UserResponse>> getById(@PathVariable Long id) {

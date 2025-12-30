@@ -6,6 +6,7 @@ import java.util.Random;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +29,7 @@ import com.ayush.habittracker.security.jwt.JwtUtil;
 import com.ayush.habittracker.security.util.AuthUtil;
 import com.ayush.habittracker.service.EmailService;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -99,10 +101,10 @@ public class AuthenticationService {
 
 		// Generate JWT token
 		String token = jwtUtil.generateToken(user);
-
+		
 		UserResponse userRes = mapper.map(user, UserResponse.class);
 
-		return new LoginResponse(token, userRes);
+		return new LoginResponse(token,userRes);
 	}
 
 	/** GET LOGGED-IN USER **/

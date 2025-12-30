@@ -69,6 +69,22 @@ public class HabitService {
 		return mapper.map(habit, HabitResponse.class);
 	}
 
+	public Page<HabitResponse> getAllHabitsByUser(int page, int size, String sortBy, String direction,Long userId) {
+		Sort sort;
+		if (direction.equalsIgnoreCase("desc")) {
+			sort = Sort.by(sortBy).descending();
+		} else {
+			sort = Sort.by(sortBy).ascending();
+		}
+
+		Pageable pageable = PageRequest.of(page, size, sort);
+
+		Page<Habit> allHabits = repo.findByUserId(userId,pageable);
+
+		return allHabits.map((habit) -> mapper.map(habit, HabitResponse.class));
+
+	}
+	
 	public Page<HabitResponse> getAllHabits(int page, int size, String sortBy, String direction) {
 		Sort sort;
 		if (direction.equalsIgnoreCase("desc")) {
@@ -85,6 +101,7 @@ public class HabitService {
 
 	}
 
+	
 	public List<HabitResponse> searchHabits(String keyword ) {
 		List<Habit> habits = repo.findByTitleContainingIgnoreCase(keyword);
 		return habits.stream().map((habit) -> mapper.map(habit, HabitResponse.class)).toList();

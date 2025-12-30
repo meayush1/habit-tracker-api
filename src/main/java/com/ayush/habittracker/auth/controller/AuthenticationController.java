@@ -21,6 +21,8 @@ import com.ayush.habittracker.dto.request.UserRequest;
 import com.ayush.habittracker.dto.request.VerifyOtpRequest;
 import com.ayush.habittracker.dto.response.UserResponse;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 @RestController
@@ -38,11 +40,30 @@ public class AuthenticationController {
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest req) {
-		LoginResponse res = authService.login(req);
+	public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request,HttpServletResponse response) {
+		LoginResponse res = authService.login(request);
+		
+		Cookie cookie = new Cookie("AUTH_TOKEN",res.getToken());
+		cookie.setHttpOnly(true); //Js can't get it
+		cookie.setSecure(false); //true for prod
+		cookie.setPath("/");
+		cookie.setMaxAge(24*60*60); //1 day
+		
+		response.addCookie(cookie);
+		
 		return ResponseUtil.success(res, "Login successful", HttpStatus.OK, null);
 	}
-
+	@PostMapping("/logout")
+	public ResponseEntity<ApiResponse<String>> logout(HttpServletResponse response){
+		Cookie cookie = new Cookie("AUTH_TOKEN",null);
+		cookie.setHttpOnly(true); //Js can't get it
+		cookie.setSecure(false); //true for prod
+		cookie.setPath("/");
+		cookie.setMaxAge(0); //1 day
+		
+		response.addCookie(cookie);
+		return ResponseUtil.success("User loggedout successfully", "Logout Successfull", HttpStatus.OK, null);
+	}
 	@GetMapping("/me")
 	public ResponseEntity<ApiResponse<UserResponse>> me(@RequestAttribute("email") String email) {
 		UserResponse user = authService.getMe(email);
