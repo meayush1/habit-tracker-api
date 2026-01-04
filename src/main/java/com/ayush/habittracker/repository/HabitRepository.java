@@ -23,6 +23,7 @@ pagination
 	 */
 	
 	public Page<Habit> findByUserId(Long userId,Pageable pageable);
+	public List<Habit> findByUserId(Long userId);
 	public List<Habit> findByTitleContainingIgnoreCase(String title);
 	public List<Habit> findByCategory(Category category);
 

@@ -53,7 +53,7 @@ public class HabitService {
 		newHabit.setId(null);
 		newHabit.setUser(user);
 		// add timestamps & save into DB
-		newHabit.setCreatedAt(LocalDateTime.now(ZoneId.of("UTC")));
+		newHabit.setCreatedAt(LocalDateTime.now(ZoneId.of("UTC")).minusDays(40));
 		newHabit.setUpdatedAt(LocalDateTime.now(ZoneId.of("UTC")));
 
 		Habit savedHabit = repo.save(newHabit);
