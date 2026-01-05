@@ -45,11 +45,11 @@ public class UserController {
 		return ResponseUtil.success(service.getUserById(id), "User fetched", HttpStatus.OK, Map.of("id", id));
 	}
 
-	@GetMapping("/all")
-	public ResponseEntity<ApiResponse<Page<UserResponse>>> getAll(@RequestParam int page, @RequestParam int size,
-			@RequestParam(defaultValue = "id") String sortBy) {
-		return ResponseUtil.success(service.getAllUsers(page, size, sortBy), "Users fetched", HttpStatus.OK, Map.of());
-	}
+//	@GetMapping("/all")
+//	public ResponseEntity<ApiResponse<Page<UserResponse>>> getAll(@RequestParam int page, @RequestParam int size,
+//			@RequestParam(defaultValue = "id") String sortBy) {
+//		return ResponseUtil.success(service.getAllUsers(page, size, sortBy), "Users fetched", HttpStatus.OK, Map.of());
+//	}
 
 	@GetMapping("/search")
 	public ResponseEntity<ApiResponse<List<UserResponse>>> search(@RequestParam String keyword) {
