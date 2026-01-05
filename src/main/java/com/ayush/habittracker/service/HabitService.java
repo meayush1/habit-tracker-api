@@ -22,11 +22,12 @@ import com.ayush.habittracker.model.User;
 import com.ayush.habittracker.repository.HabitRepository;
 import com.ayush.habittracker.repository.UserRepository;
 import com.ayush.habittracker.security.util.AuthUtil;
-
-import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class HabitService {
+	private static final Logger log = LoggerFactory.getLogger(HabitService.class);
 
 	@Autowired
 	HabitRepository repo;
@@ -40,9 +41,9 @@ public class HabitService {
 	@Autowired
 	AuthUtil authUtil;
 
-	public HabitResponse createHabit(Long userId, HabitRequest req ) {
+	public HabitResponse createHabit(Long userId, HabitRequest req) {
 		// check ownership
-		authUtil.checkOwnership( authUtil.getLoggedInUserId(), userId);
+		authUtil.checkOwnership(authUtil.getLoggedInUserId(), userId);
 		User user = userRepo.findById(userId)
 				.orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
 
@@ -57,19 +58,19 @@ public class HabitService {
 		newHabit.setUpdatedAt(LocalDateTime.now(ZoneId.of("UTC")));
 
 		Habit savedHabit = repo.save(newHabit);
-
+		log.info("Creating habit for userId={}", userId);
 		// return habitResponse
 		return mapper.map(savedHabit, HabitResponse.class);
 	}
 
-	public HabitResponse getHabitById(Long id ) {
+	public HabitResponse getHabitById(Long id) {
 		Habit habit = repo.findById(id).orElseThrow(() -> new HabitNotFoundException("Habit not found with id: " + id));
 		// check ownership
-		authUtil.checkOwnership( authUtil.getLoggedInUserId(), habit.getUser().getId());
+		authUtil.checkOwnership(authUtil.getLoggedInUserId(), habit.getUser().getId());
 		return mapper.map(habit, HabitResponse.class);
 	}
 
-	public Page<HabitResponse> getAllHabitsByUser(int page, int size, String sortBy, String direction,Long userId) {
+	public Page<HabitResponse> getAllHabitsByUser(int page, int size, String sortBy, String direction, Long userId) {
 		Sort sort;
 		if (direction.equalsIgnoreCase("desc")) {
 			sort = Sort.by(sortBy).descending();
@@ -79,12 +80,12 @@ public class HabitService {
 
 		Pageable pageable = PageRequest.of(page, size, sort);
 
-		Page<Habit> allHabits = repo.findByUserId(userId,pageable);
+		Page<Habit> allHabits = repo.findByUserId(userId, pageable);
 
 		return allHabits.map((habit) -> mapper.map(habit, HabitResponse.class));
 
 	}
-	
+
 	public Page<HabitResponse> getAllHabits(int page, int size, String sortBy, String direction) {
 		Sort sort;
 		if (direction.equalsIgnoreCase("desc")) {
@@ -101,31 +102,30 @@ public class HabitService {
 
 	}
 
-	
-	public List<HabitResponse> searchHabits(String keyword ) {
+	public List<HabitResponse> searchHabits(String keyword) {
 		List<Habit> habits = repo.findByTitleContainingIgnoreCase(keyword);
 		return habits.stream().map((habit) -> mapper.map(habit, HabitResponse.class)).toList();
 	}
 
-	public List<HabitResponse> filterByCategory(Category category ) {
+	public List<HabitResponse> filterByCategory(Category category) {
 		List<Habit> habits = repo.findByCategory(category);
 		return habits.stream().map((habit) -> mapper.map(habit, HabitResponse.class)).toList();
 	}
 
-	public HabitResponse updateHabit(Long id, HabitRequest req ) {
+	public HabitResponse updateHabit(Long id, HabitRequest req) {
 		Habit habit = repo.findById(id).orElseThrow(() -> new HabitNotFoundException("Habit not found with id: " + id));
 		// check ownership
-		authUtil.checkOwnership( authUtil.getLoggedInUserId(), habit.getUser().getId());
+		authUtil.checkOwnership(authUtil.getLoggedInUserId(), habit.getUser().getId());
 		mapper.map(req, habit);
 		habit.setUpdatedAt(LocalDateTime.now(ZoneId.of("UTC")));
 		Habit updatedHabit = repo.save(habit);
 		return mapper.map(updatedHabit, HabitResponse.class);
 	}
 
-	public HabitResponse deleteHabit(Long id ) {
+	public HabitResponse deleteHabit(Long id) {
 		Habit habit = repo.findById(id).orElseThrow(() -> new HabitNotFoundException("Habit not found with id: " + id));
 		// check ownership
-		authUtil.checkOwnership( authUtil.getLoggedInUserId(), habit.getUser().getId());
+		authUtil.checkOwnership(authUtil.getLoggedInUserId(), habit.getUser().getId());
 		repo.delete(habit);
 		return mapper.map(habit, HabitResponse.class);
 	}
